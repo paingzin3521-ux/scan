@@ -93,12 +93,12 @@ def _lg(e_s="Checking..."):
     try: term_w=os.get_terminal_size()[0]
     except: term_w=80
     logo = [
-        "  _____  _    _ _____       _ _____ ______ ",
-        " |  __ \| |  | |_   _|     | |_   _|  ____|",
-        " | |__) | |  | | | |       | | | | | |__   ",
-        " |  _  /| |  | | | |   _   | | | | |  __|",
-        " | | \ \| |__| |_| |_ | |__| |_| |_| |____ ",
-        " |_|  \_\\____/|_____| \____/|_____|______|"
+        r"  _____  _    _ _____       _ _____ ______ ",
+        r" |  __ \| |  | |_   _|     | |_   _|  ____|",
+        r" | |__) | |  | | | |       | | | | | |__   ",
+        r" |  _  /| |  | | | |   _   | | | | |  __|",
+        r" | | \ \| |__| |_| |_ | |__| |_| |_| |____ ",
+        r" |_|  \_\____/|_____| \____/|_____|______|"
     ]
     print(f"\n{_g_}", end="")
     for line in logo:
@@ -117,7 +117,7 @@ class _A_M_:
     def __init__(self):
         self.expiry_status = "Checking..."
         self.exp_time = 0
-        self.secret_key = b'ကိုယ်ကြိုက်ရာ secret စာသား ထည့်ပါ'
+        self.secret_key = b'RjYkhwzx_bypass_2024'
         self.local_file = os.path.join(HIDDEN_DIR, "system_expiry.sys")
 
     def _get_hash(self, exp, lt):
