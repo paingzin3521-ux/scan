@@ -17,64 +17,96 @@
 
 ---
 
-## 🔑 KEY စီမံခန့်ခွဲမှု (Admin Guide)
+## 🤖 Telegram Key Admin Bot
 
-### Key ဘယ်မှာ သိမ်းထားသလဲ?
-Keys များကို API server တွင် သိမ်းဆည်းသည်:
+**`tg_key_admin.py`** — Telegram မှတဆင့် Key တွေ Approve/Deny/Extend လုပ်နိုင်သော Bot
+
+### Setup
+
+**အဆင့် ၁ — Bot ဖန်တီးပါ**
+1. Telegram မှာ [@BotFather](https://t.me/BotFather) ကို ဖွင့်ပါ
+2. `/newbot` ပို့ပြီး Bot name နဲ့ username ထည့်ပါ
+3. ရလာသော Token ကို မှတ်ထားပါ (`123456789:ABCdef...`)
+
+**အဆင့် ၂ — Admin ID ရှာပါ**
+1. [@userinfobot](https://t.me/userinfobot) ကို message တစ်ခုပို့ပါ
+2. ပြန်ပို့လာသော `Id:` နံပါတ်ကို မှတ်ထားပါ
+
+**အဆင့် ၃ — Run ပါ**
+```bash
+cd scan
+pip install python-telegram-bot requests
+
+# Token နဲ့ Admin ID ထည့်ပြီး run
+TELEGRAM_BOT_TOKEN="YOUR_TOKEN" TELEGRAM_ADMIN_ID="YOUR_ID" python tg_key_admin.py
 ```
-https://passbot-e08t.onrender.com/api/keys
+
+**သို့မဟုတ် `.env` file သုံး:**
+```bash
+# .env file ဖန်တီးပါ
+echo 'TELEGRAM_BOT_TOKEN=YOUR_TOKEN' > .env
+echo 'TELEGRAM_ADMIN_ID=YOUR_ID'    >> .env
+
+# python-dotenv install
+pip install python-dotenv
+
+# tg_key_admin.py ထဲ ဒီ ၂ ကြောင်း ထည့်ပါ (ထိပ်ဆုံးမှာ):
+# from dotenv import load_dotenv
+# load_dotenv()
+python tg_key_admin.py
 ```
 
-### Admin — Key Approve လုပ်နည်း
-User ရဲ့ Device Key (`DEV-XXXXXXXXXXXX`) ကို API keys list ထဲ ထည့်ပေးရသည်။
+### Bot Commands
 
-**API Response Format ဖြစ်ရမည်:**
-```json
-{
-  "expirations": {
-    "DEV-XXXXXXXXXXXX": 1787065278
-  }
-}
+| Command | လုပ်ဆောင်ချက် |
+|---------|--------------|
+| `/start` | Main menu ဖွင့်ရန် |
+| `/list` | Key အားလုံး ကြည့်ရန် |
+| `/fetch` | Server မှ Sync ဆွဲယူရန် |
+| `/expired` | Expired key တွေ ကြည့်ရန် |
+| `/clean` | Expired key အားလုံး ဖျက်ရန် |
+| `/cancel` | လုပ်ဆောင်မှု ဖျက်သိမ်းရန် |
+
+### Bot Buttons (Inline Keyboard)
+
 ```
-- Key — User ရဲ့ Device Key
-- Value — Unix timestamp (expiry ရက်)
+📋 List Keys    ➕ Add Key
+🗑 Remove Key  ⏫ Extend Key
+🔍 Check Key   🔄 Sync Server
+⚠️ Expired      🧹 Clean Expired
+```
 
-### Key Status များ
-| Status | အဓိပ္ပါယ် |
-|--------|-----------|
-| `Approved` ✅ | Key အတည်ပြုပြီး၊ အသုံးပြုနိုင်သည် |
-| `Expired` ⏳ | Key ရက်လွန်သွားသည် — Admin ပြန် Extend လုပ်ပေးရမည် |
-| `Not Registered` ❌ | Key list ထဲ မပါသေး — Admin ထည့်ပေးရမည် |
-| `Time Spoofing!` ⚠️ | Device ရဲ့ နာရီ ပြောင်းထားသည် — မသုံးနိုင် |
-| `Offline/Error` 📡 | Server ချိတ်မိခြင်း မရှိ — Internet စစ်ပါ |
+### Add Key Flow (Bot Chat ထဲမှာ)
+
+```
+သင်  →  /start
+Bot  →  [Menu Buttons]
+သင်  →  ➕ Add Key နှိပ်
+Bot  →  "Device Key ထည့်ပါ"
+သင်  →  DEV-XXXXXXXXXXXX
+Bot  →  "ရက်အရေအတွက် ထည့်ပါ"
+သင်  →  30
+Bot  →  ✅ Key Approved! DEV-XXXX | 30 ရက်
+```
+
+### Background Run (Termux)
+
+```bash
+# Background မှာ ထားဖို့
+nohup TELEGRAM_BOT_TOKEN="TOKEN" TELEGRAM_ADMIN_ID="ID" python tg_key_admin.py &
+
+# Log ကြည့်
+cat nohup.out
+
+# ရပ်ဖို့
+pkill -f tg_key_admin.py
+```
 
 ---
 
-## 👤 USER Guide — Key ဘယ်လိုရရှိမလဲ?
+## 🔧 Key Admin Script (Terminal)
 
-### အဆင့် ၁ — Device Key ရှာပါ
-Tool ကို Run သောအခါ Main Menu တွင် Device Key ပေါ်လာသည်:
-```
-[*] Device Key  : DEV-XXXXXXXXXXXX
-```
-ဒီ Key ကို Admin ဆီ ပေးပို့ပါ (Screenshot သို့မဟုတ် Copy ကူးပြီး)။
-
-### အဆင့် ၂ — Admin ဆီ Key တောင်းပါ
-Admin ဆီ Device Key ပေးပြီး Approve တောင်းပါ။ Admin က Server မှာ Key ထည့်ပေးမည်။
-
-### အဆင့် ၃ — Key စစ်ဆေးပါ
-Admin က Approve လုပ်ပြီးသည်နှင့် Tool ကို ပြန် Run ပါ — Status `Approved` ပြမည်။
-
-### Key Status မပြောင်းလဲပါက — Option 5 သုံးပါ
-```
-Main Menu → [5] Reset Expiry Date
-```
-
----
-
-## 🔧 Key Admin Manager
-
-`key_admin.py` — Admin တွေ key တွေ ထည့်/ဖျက်/တိုးဖို့ script
+`key_admin.py` — Colored terminal UI နဲ့ key manage လုပ်ဖို့
 
 ```bash
 python key_admin.py
@@ -93,146 +125,66 @@ python key_admin.py
 
 ---
 
-## 🕐 SERVER 24H KEEP-ALIVE
+## 🔑 KEY စီမံခန့်ခွဲမှု
 
-Render.com free tier သည် **15 မိနစ်** သုံးမိသူမရှိရင် sleep ဖြစ်သည်။
-ရုတ်တရတ် ဝင်လာသောအခါ cold start ကြောင့် **30 စက္ကန့်** ကျော် နှေးသွားနိုင်သည်။
+### Key ဘယ်မှာ သိမ်းထားသလဲ?
+```
+https://passbot-e08t.onrender.com/api/keys
+```
 
-နည်းလမ်း ၃ ခု — တစ်ခုမှ သုံးလျှင် ရပြီ၊ အကောင်းဆုံး ၃ ခုလုံး သုံးနိုင်သည်:
+### Key Status များ
+| Status | အဓိပ္ပါယ် |
+|--------|-----------|
+| `Approved` ✅ | Key အတည်ပြုပြီး၊ အသုံးပြုနိုင်သည် |
+| `Expired` ⏳ | Key ရက်လွန်သွားသည် — Admin ပြန် Extend လုပ်ပေးရမည် |
+| `Not Registered` ❌ | Key list ထဲ မပါသေး — Admin ထည့်ပေးရမည် |
+| `Time Spoofing!` ⚠️ | Device ရဲ့ နာရီ ပြောင်းထားသည် — မသုံးနိုင် |
+| `Offline/Error` 📡 | Server ချိတ်မိခြင်း မရှိ — Internet စစ်ပါ |
+
+### USER — Key ဘယ်လိုရမလဲ?
+1. Tool run ပြီး Main Menu မှာ `DEV-XXXXXXXXXXXX` Key ကို Admin ဆီ ပေးပါ
+2. Admin က Bot ကနေ Approve လုပ်ပေးမည်
+3. Tool ကို ပြန် Run ပါ — `Approved` ပြမည်
+4. Status မပြောင်းရင် Option `5` (Reset Expiry) နှိပ်ပါ
 
 ---
 
-### 📱 နည်းလမ်း ၁ — Termux Keep-Alive Script
+## 🕐 SERVER 24H KEEP-ALIVE
 
-ဖုန်း on နေချိန် background မှာ ping ပေး (4 မိနစ်တစ်ကြိမ်)
-
+### 📱 နည်းလမ်း ၁ — Termux Script
 ```bash
-# ထည့်ပြီးသား repo ကို သုံးမည်ဆိုရင်
-cd scan
 pip install requests
 python keep_alive.py
 ```
-
-**Background run ဖို့ (Termux ပိတ်ထားလဲ run နေအောင်):**
+Background run:
 ```bash
-# nohup နဲ့ background run
 nohup python keep_alive.py > /dev/null 2>&1 &
-
-# Process ID စစ်ကြည့်
-ps aux | grep keep_alive
-
-# ရပ်ဖို့
-kill <PID>
 ```
 
-**Termux:Boot နဲ့ ဖုန်း ပြန်ဖွင့်လျှင် auto-start ဖို့:**
-```bash
-# Termux:Boot install လုပ်ပြီးရင်
-mkdir -p ~/.termux/boot/
-cat > ~/.termux/boot/keepalive.sh << 'EOF'
-#!/data/data/com.termux/files/usr/bin/bash
-cd ~/scan
-nohup python keep_alive.py > /dev/null 2>&1 &
-EOF
-chmod +x ~/.termux/boot/keepalive.sh
-```
-
-Log ကြည့်ဖို့:
-```bash
-cat ~/.key_admin/keepalive.log
-```
-
----
-
-### ⚙️ နည်းလမ်း ၂ — GitHub Actions (အကောင်းဆုံး — Cloud မှာ အမြဲ run)
-
-ဖုန်း off ထားလဲ GitHub server မှ 5 မိနစ်တစ်ကြိမ် ping ပေးမည်။
-
-**Setup အဆင့်များ:**
-
-1. GitHub repo ကို သွားပါ → **Settings** tab
-2. **Actions → General** → "Allow all actions" enable လုပ်ပါ
-3. Repo ထဲ ဒီ folder/file ဖန်တီးပါ:
-
-```
-.github/
-  workflows/
-    keep_alive.yml
-```
-
-4. `keep_alive.yml` ထဲမှာ ဒီ code ထည့်ပါ:
-
+### ⚙️ နည်းလမ်း ၂ — GitHub Actions
+Repo ထဲ `.github/workflows/keep_alive.yml` ဖိုင်ဖန်တီးပြီး:
 ```yaml
 name: Server Keep-Alive
-
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes
-  workflow_dispatch:         # manual trigger button
-
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping passbot server
+      - name: Ping
         run: |
-          echo "Pinging at $(date)"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
             https://passbot-e08t.onrender.com/api/keys)
-          if [ "$STATUS" = "200" ]; then
-            echo "✔ Server alive — HTTP $STATUS"
-          else
-            echo "✘ HTTP $STATUS"
-            exit 1
-          fi
+          echo "HTTP $STATUS"
 ```
 
-5. File save လုပ်ပြီးရင် **Actions tab** တွင် workflow run နေသည် မြင်ရမည်
-
-> ⚠️ **Note:** GitHub Actions cron သည် free repo တွင် ±5 မိနစ် နောက်ကျနိုင်သည်
-
----
-
-### ☁️ နည်းလမ်း ၃ — UptimeRobot (အပိုအလုပ်မလုပ်ဘဲ Cloud ကနေ monitor)
-
-အခမဲ့ — ဖုန်းမလိုဘဲ cloud ကနေ 5 မိနစ်တစ်ကြိမ် ping ပေးသည်
-
-**Setup (5 မိနစ်):**
-
-1. [uptimerobot.com](https://uptimerobot.com) ကို သွားပြီး **Free account** ဖွင့်ပါ
-2. Dashboard → **"+ Add New Monitor"** နှိပ်ပါ
-3. Settings:
-   - **Monitor Type:** `HTTP(s)`
-   - **Friendly Name:** `Passbot Server`
-   - **URL:** `https://passbot-e08t.onrender.com/api/keys`
-   - **Monitoring Interval:** `5 minutes`
-4. **"Create Monitor"** နှိပ်ပြီး ပြီးပြီ ✔
-
-Dashboard တွင် uptime %, response time graph မြင်ရမည်။
-Server down ဖြစ်ရင် email alert ပေးမည်။
-
----
-
-### 🆚 နည်းလမ်းများ နှိုင်းယှဉ်ချက်
-
-| နည်းလမ်း | ဖုန်းလိုသလား | ဆာဗာ Off ဖုန်း | Setup အချိန် | Alert |
-|-----------|------------|----------------|-------------|-------|
-| Termux Script | ✅ လိုသည် | ❌ ရပ်မည် | 1 မိနစ် | ❌ |
-| GitHub Actions | ❌ မလို | ✅ run မည် | 5 မိနစ် | ✅ |
-| UptimeRobot | ❌ မလို | ✅ run မည် | 5 မိနစ် | ✅ Email |
-
-**အကြံပြုချက်:** GitHub Actions + UptimeRobot ၂ ခုလုံး သုံးပါ
-
----
-
-### 💡 Render.com Paid Plan အကြောင်း
-
-| Plan | စျေးနှုန်း | Sleep | Notes |
-|------|---------|-------|-------|
-| Free | $0 | ✅ (15 min) | Keep-alive script လိုသည် |
-| Starter | $7/mo | ❌ Always-on | ပိုကောင်းသည် |
-
-Free plan + keep-alive နည်းလမ်းသုံးမည်ဆိုရင် **GitHub Actions + UptimeRobot** ပေါင်းသုံးခြင်းသည် paid plan နဲ့ ဆင်တူသောအဖြေဖြစ်သည်။
+### ☁️ နည်းလမ်း ၃ — UptimeRobot (အကောင်းဆုံး)
+1. [uptimerobot.com](https://uptimerobot.com) — Free account ဖွင့်ပါ
+2. **+ Add New Monitor** → HTTP(s)
+3. URL: `https://passbot-e08t.onrender.com/api/keys`
+4. Interval: `5 minutes` → Create ✔
 
 ---
 
@@ -241,7 +193,7 @@ Free plan + keep-alive နည်းလမ်းသုံးမည်ဆိုရ
 ```bash
 pkg update && pkg upgrade -y
 pkg install python git -y
-pip install requests aiohttp pycryptodome
+pip install requests aiohttp pycryptodome python-telegram-bot
 git clone https://github.com/paingzin3521-ux/scan.git
 cd scan
 python "scan (2).py"
@@ -249,26 +201,27 @@ python "scan (2).py"
 
 ---
 
-## ❓ အဖြစ်များသော ပြဿနာများ
+## 📁 Files
+
+| File | အသုံး |
+|------|-------|
+| `scan (2).py` | Main Wifi Bypass Tool |
+| `tg_key_admin.py` | Telegram Bot Key Admin |
+| `key_admin.py` | Terminal Key Admin |
+| `keep_alive.py` | Server Keep-Alive Ping |
+
+---
+
+## ❓ FAQ
 
 **Q: Key Approved ဖြစ်နေပါတယ် ဒါပေမဲ့ Option 4 မအလုပ်မလုပ်ဘူး**
 → Option 3 ကို ဦးစွာ Run ပြီး Active Devices စစ်ပါ။
 
 **Q: Not Registered ပြနေတယ်**
-→ Device Key ကို Admin ဆီ ပေးပြီး Approve တောင်းပါ။
-
-**Q: Expired ပြနေတယ်**
-→ Admin ဆီ ပြောပြီး Key Extend တောင်းပါ၊ ပြီးရင် Option 5 နှိပ်ပါ။
+→ Device Key ကို Admin ဆီ ပေးပြီး Bot ကနေ Approve တောင်းပါ။
 
 **Q: Server ဖြေကြားမှုနှေးနေတယ်**
-→ Server sleep ဖြစ်နေနိုင်သည် — Keep-alive script setup လုပ်ပါ။
+→ Keep-alive setup မလုပ်ရသေး — UptimeRobot သုံးပါ။
 
-**Q: Offline/Error ပြနေတယ်**
-→ Internet စစ်ပါ၊ Server ယာယီ Down ဖြစ်နေနိုင်သည်။
-
----
-
-## 📌 Notes
-- Tool သည် Termux (Android) တွင်သာ အပြည့်အဝ အလုပ်လုပ်သည်
-- Storage Permission ခွင့်ပြုရမည် (Setup ဝင်ဝင်ချင်း တောင်းမည်)
-- Device Key သည် Device Info အပေါ်မူတည်၍ Auto-Generate ဖြစ်သည်
+**Q: Bot မတုံ့ပြန်ဘူး**
+→ Token နဲ့ Admin ID မှန်မမှန် စစ်ပါ၊ `python tg_key_admin.py` ပြန် run ပါ။
