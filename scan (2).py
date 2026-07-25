@@ -117,7 +117,7 @@ class _A_M_:
     def __init__(self):
         self.expiry_status = "Checking..."
         self.exp_time = 0
-        self.secret_key = b'ကိုယ်ကြိုက်ရာ secret စာသား ထည့်ပါ'
+        self.secret_key = b'Bypass-Secret-2024-X-99'
         self.local_file = os.path.join(HIDDEN_DIR, "system_expiry.sys")
 
     def _get_hash(self, exp, lt):
